@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radiology Diagnostic Command Center</title>
+    <style>
+        :root {
+            --emory-blue: #002855;
+            --emory-gold: #b58500;
+            --bg-color: #f4f7f9;
+            --text-color: #2d3436;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            background: var(--emory-blue);
+            color: white;
+            width: 100%;
+            padding: 3rem 0;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        h1 { margin: 0; font-size: 2.2rem; letter-spacing: 1px; }
+        .subtitle { opacity: 0.9; margin-top: 10px; font-weight: 300; }
+
+        .container {
+            max-width: 1000px;
+            width: 90%;
+            margin-top: 50px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .organ-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            text-decoration: none;
+            color: var(--text-color);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+            transition: all 0.3s ease;
+            border-bottom: 5px solid transparent;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .organ-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+            border-bottom: 5px solid var(--emory-gold);
+        }
+
+        .icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .organ-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--emory-blue);
+        }
+
+        .description {
+            font-size: 0.9rem;
+            color: #636e72;
+            line-height: 1.4;
+        }
+
+        footer {
+            margin-top: auto;
+            padding: 40px;
+            font-size: 0.8rem;
+            color: #b2bec3;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Diagnostic Decision Hub</h1>
+    <div class="subtitle">Emory Radiology | Medical Informatics Specialist Portal</div>
+</header>
+
+<div class="container">
+    <a href="file:///Users/irene/Decision%20tree/liver.html" class="organ-card">
+        <div class="icon">🩸</div>
+        <div class="organ-name">Liver</div>
+        <div class="description">Analysis of hypervascular/hypovascular masses and diffuse parenchymal patterns.</div>
+    </a>
+
+    <a href="file:///Users/irene/Decision%20tree/adrenal_glands.html" class="organ-card">
+        <div class="icon">🔋</div>
+        <div class="organ-name">Adrenal Glands</div>
+        <div class="description">Washout calculators and differentiation of lipid-rich vs. lipid-poor lesions.</div>
+    </a>
+
+    <a href="file:///Users/irene/Decision%20tree/pancreas.html" class="organ-card">
+        <div class="icon">🎗️</div>
+        <div class="organ-name">Pancreas</div>
+        <div class="description">Differentiating Ductal Adenocarcinoma from Autoimmune and Chronic Pancreatitis.</div>
+    </a>
+</div>
+
+<footer>
+    &copy; 2025 Radiology Thought Partner | Diagnostic Workflow Suite
+</footer>
+
+</body>
+</html>
