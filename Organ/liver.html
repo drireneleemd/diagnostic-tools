@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liver Diagnostic Decision Suite</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #333;
+            --shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 30px;
+            border-top: 6px solid var(--primary-color);
+        }
+
+        h2 {
+            margin-top: 0;
+            color: var(--primary-color);
+            font-size: 1.6rem;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .grid-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        @media (max-width: 600px) {
+            .grid-inputs { grid-template-columns: 1fr; }
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        label {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #555;
+        }
+
+        select {
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e0;
+            background-color: #fff;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-1px);
+        }
+
+        #results {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: #f1f5f9;
+            border-radius: 10px;
+            display: none;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        #results strong {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+
+        ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .mindmap-container {
+            overflow-x: auto;
+            padding: 20px 0;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(44, 62, 80, 0.95);
+            color: #fff;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            z-index: 9999;
+            display: none;
+            max-width: 300px;
+            pointer-events: none;
+            line-height: 1.4;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+
+<div id="tooltip" class="tooltip"></div>
+
+<div class="container">
+    <section class="card">
+        <h2>Clinical Decision Support Engine</h2>
+        <div class="grid-inputs">
+            <div class="input-group">
+                <label for="primaryFeature">Primary Imaging Feature (Branch)</label>
+                <select id="primaryFeature" onchange="updateSubBranch()">
+                    <option value="">-- Select Pattern --</option>
+                    <option value="hyper">Hypervascular Lesions (Arterial Phase Enhancement)</option>
+                    <option value="hypo">Hypovascular Lesions (Minimal/No Arterial Enhancement)</option>
+                    <option value="diffuse">Diffuse Parenchymal Disease (Global Involvement)</option>
+                    <option value="vascular">Vascular Pattern (Vascular Abnormalities)</option>
+                    <option value="infectious">Infectious/Inflammatory Pattern</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label for="secondaryFeature">Morphology / Sub-branch</label>
+                <select id="secondaryFeature">
+                    <option value="">-- Select Sub-branch --</option>
+                </select>
+            </div>
+        </div>
+        <button onclick="analyzeData()">Analyze Differential Diagnosis</button>
+
+        <div id="results">
+            <strong>Potential Diagnoses & Descriptions:</strong>
+            <ul id="diagnosisList"></ul>
+        </div>
+    </section>
+
+    <section class="card">
+        <h2>Diagnostic Mind Map</h2>
+        <div class="mindmap-container">
+            <pre class="mermaid">
+                graph LR
+                    Root[Liver Pattern Analysis] --> HYPER[Hypervascular]
+                    Root --> HYPO[Hypovascular]
+                    Root --> DIFF[Diffuse]
+                    Root --> VASC[Vascular]
+                    Root --> INF[Infectious]
+
+                    HYPER --> H1[Washout Present]
+                    HYPER --> H2[No Washout / Persistent]
+                    
+                    HYPO --> HO1[Cystic / Fluid]
+                    HYPO --> HO2[Solid / Low Attenuation]
+
+                    DIFF --> D1[Increased Attenuation]
+                    DIFF --> D2[Biliary Pattern]
+
+                    H1 --> HCC[Hepatocellular Carcinoma]
+                    H1 --> ICC[Intrahepatic Cholangiocarcinoma]
+                    H1 --> HVM[Hypervascular Metastases]
+
+                    H2 --> HEM[Hemangioma]
+                    H2 --> FNH[Focal Nodular Hyperplasia]
+                    H2 --> HCA[Hepatocellular Adenoma]
+
+                    HO1 --> SC[Simple Hepatic Cyst]
+                    HO1 --> ABS[Hepatic Abscess]
+                    HO1 --> EC[Echinococcal Cyst]
+                    HO1 --> CM[Cystic Metastases]
+
+                    HO2 --> MET[Metastases]
+                    HO2 --> CHO[Cholangiocarcinoma]
+                    HO2 --> LYM[Lymphoma]
+                    HO2 --> FMA[Fungal Microabscesses]
+
+                    D1 --> HS[Hepatic Steatosis]
+                    D1 --> HC[Hemochromatosis]
+                    D1 --> CIR[Cirrhosis]
+
+                    D2 --> PSC[Primary Sclerosing Cholangitis]
+                    D2 --> PBC[Primary Biliary Cholangitis]
+                    D2 --> IGG[IgG4-Related Sclerosing Cholangitis]
+
+                    VASC --> PVT[Portal Vein Thrombosis]
+                    VASC --> PSVD[Porto-sinusoidal Vascular Disease]
+                    VASC --> BCS[Budd-Chiari Syndrome]
+                    VASC --> HI[Hepatic Infarction]
+
+                    INF --> PYA[Pyogenic Abscess]
+                    INF --> VH[Viral Hepatitis]
+                    INF --> AH[Autoimmune Hepatitis]
+                    INF --> FI[Fungal Infection]
+            </pre>
+        </div>
+    </section>
+</div>
+
+<script>
+    // Comprehensive Dataset
+    const decisionData = {
+        "hyper": {
+            label: "Hypervascular Lesions",
+            subBranches: {
+                "washout": {
+                    label: "Washout Present",
+                    diagnosis: [
+                        "Hepatocellular Carcinoma: Most common primary malignancy in cirrhosis.",
+                        "Intrahepatic Cholangiocarcinoma: May show rim enhancement with progressive central filling.",
+                        "Hypervascular Metastases: Commonly from Neuroendocrine tumors, Melanoma, or Renal Cell Carcinoma."
+                    ]
+                },
+                "no_washout": {
+                    label: "No Washout / Persistent Enhancement",
+                    diagnosis: [
+                        "Hemangioma: Peripheral nodular discontinuous enhancement with centripetal fill-in.",
+                        "Focal Nodular Hyperplasia: Central scar with homogeneous arterial enhancement.",
+                        "Hepatocellular Adenoma: Variable enhancement, may contain intracellular fat."
+                    ]
+                }
+            }
+        },
+        "hypo": {
+            label: "Hypovascular Lesions",
+            subBranches: {
+                "cystic": {
+                    label: "Cystic / Fluid Attenuation",
+                    diagnosis: [
+                        "Simple Hepatic Cyst: No enhancement, homogeneous fluid signal.",
+                        "Pyogenic Hepatic Abscess: Rim enhancement with low attenuation center.",
+                        "Echinococcal Cyst: Presence of daughter cysts or wall calcifications.",
+                        "Cystic Metastases: Often from mucinous primary tumors."
+                    ]
+                },
+                "solid": {
+                    label: "Solid / Low Attenuation",
+                    diagnosis: [
+                        "Metastases: The most common malignant liver lesion overall.",
+                        "Cholangiocarcinoma: Exhibits progressive delayed enhancement.",
+                        "Lymphoma: Homogeneous, minimal enhancement pattern.",
+                        "Fungal Microabscesses: Multiple small lesions, often in immunocompromised patients."
+                    ]
+                }
+            }
+        },
+        "diffuse": {
+            label: "Diffuse Parenchymal Disease",
+            subBranches: {
+                "attenuation": {
+                    label: "Increased Attenuation / Altered Signal",
+                    diagnosis: [
+                        "Hepatic Steatosis: Decreased attenuation on Computed Tomography; signal drop on opposed-phase Magnetic Resonance Imaging.",
+                        "Hemochromatosis: Increased attenuation on Computed Tomography; decreased T2 signal on Magnetic Resonance Imaging.",
+                        "Cirrhosis: Nodular liver contour with volume redistribution."
+                    ]
+                },
+                "biliary": {
+                    label: "Biliary Pattern (Ductal Dilatation)",
+                    diagnosis: [
+                        "Primary Sclerosing Cholangitis: Multifocal strictures and dilatations on Magnetic Resonance Cholangiopancreatography.",
+                        "Primary Biliary Cholangitis: Characterized by intrahepatic duct paucity.",
+                        "Immunoglobulin G4-related Sclerosing Cholangitis: Diffuse or segmental bile duct involvement."
+                    ]
+                }
+            }
+        },
+        "vascular": {
+            label: "Vascular Pattern",
+            subBranches: {
+                "v_general": {
+                    label: "Vascular Abnormalities",
+                    diagnosis: [
+                        "Portal Vein Thrombosis: Filling defect in portal vein; low attenuation on Computed Tomography.",
+                        "Porto-sinusoidal Vascular Disease: Portal hypertension without cirrhotic morphology.",
+                        "Budd-Chiari Syndrome: Hepatic vein occlusion and caudate lobe hypertrophy.",
+                        "Hepatic Infarction: Wedge-shaped peripheral areas of decreased enhancement."
+                    ]
+                }
+            }
+        },
+        "infectious": {
+            label: "Infectious/Inflammatory",
+            subBranches: {
+                "i_general": {
+                    label: "Regional/Multifocal Involvement",
+                    diagnosis: [
+                        "Pyogenic Abscess: Rim-enhancing fluid collection.",
+                        "Viral Hepatitis: Periportal edema and gallbladder wall thickening.",
+                        "Autoimmune Hepatitis: Heterogeneous parenchymal enhancement with periportal edema.",
+                        "Fungal Infection: Multiple small hypodense lesions."
+                    ]
+                }
+            }
+        }
+    };
+
+    // Descriptions for Mind Map Tooltips (Mapping Node IDs to Text)
+    const nodeDescriptions = {
+        "HCC": "Hepatocellular Carcinoma: Primary liver cancer, usually in the setting of cirrhosis.",
+        "ICC": "Intrahepatic Cholangiocarcinoma: Bile duct cancer located within the liver parenchyma.",
+        "HVM": "Hypervascular Metastases: Spread from neuroendocrine tumors, renal cell, or thyroid cancer.",
+        "HEM": "Hemangioma: Benign vascular tumor with characteristic 'light bulb' T2 brightness.",
+        "FNH": "Focal Nodular Hyperplasia: Benign regenerative nodule with a central stellate scar.",
+        "HCA": "Hepatocellular Adenoma: Benign tumor associated with oral contraceptives or steroids.",
+        "SC": "Simple Cyst: Common benign fluid-filled lesion with no wall enhancement.",
+        "ABS": "Hepatic Abscess: Infected collection often showing a 'double target' sign.",
+        "EC": "Echinococcal Cyst: Parasitic infection leading to complex cystic structures.",
+        "MET": "Metastases: Secondary malignant spread; significantly more common than primary liver cancer.",
+        "CHO": "Cholangiocarcinoma: Demonstrates pooling of contrast on delayed imaging due to fibrous stroma.",
+        "LYM": "Lymphoma: May present as a mass or diffuse infiltration; often hypovascular.",
+        "HS": "Steatosis: Fatty liver; characterized by signal loss on out-of-phase Magnetic Resonance Imaging.",
+        "HC": "Hemochromatosis: Iron overload; causes the liver to appear very dark on T2-weighted sequences.",
+        "CIR": "Cirrhosis: End-stage fibrosis with nodular transformation and portal hypertension.",
+        "PSC": "Primary Sclerosing Cholangitis: 'Beaded' appearance of bile ducts due to chronic inflammation.",
+        "PVT": "Portal Vein Thrombosis: Can be bland (clot) or tumoral (invasion by Hepatocellular Carcinoma).",
+        "BCS": "Budd-Chiari Syndrome: Results from obstruction of hepatic venous outflow.",
+        "AH": "Autoimmune Hepatitis: Chronic inflammation leading to cirrhosis if untreated.",
+        "VH": "Viral Hepatitis: Acute phase shows 'starry sky' appearance on Computed Tomography/Magnetic Resonance Imaging."
+    };
+
+    function updateSubBranch() {
+        const primary = document.getElementById('primaryFeature').value;
+        const secondaryDropdown = document.getElementById('secondaryFeature');
+        secondaryDropdown.innerHTML = '<option value="">-- Select Sub-branch --</option>';
+
+        if (primary && decisionData[primary]) {
+            const subs = decisionData[primary].subBranches;
+            for (let key in subs) {
+                let opt = document.createElement('option');
+                opt.value = key;
+                opt.innerHTML = subs[key].label;
+                secondaryDropdown.appendChild(opt);
+            }
+        }
+    }
+
+    function analyzeData() {
+        const primary = document.getElementById('primaryFeature').value;
+        const secondary = document.getElementById('secondaryFeature').value;
+        const resultDiv = document.getElementById('results');
+        const list = document.getElementById('diagnosisList');
+
+        if (!primary || !secondary) {
+            alert("Please select both a Primary Pattern and a Sub-branch.");
+            return;
+        }
+
+        list.innerHTML = "";
+        const diagnoses = decisionData[primary].subBranches[secondary].diagnosis;
+        
+        diagnoses.forEach(d => {
+            let li = document.createElement('li');
+            li.textContent = d;
+            list.appendChild(li);
+        });
+
+        resultDiv.style.display = "block";
+    }
+
+    // Initialize Mermaid
+    mermaid.initialize({ 
+        startOnLoad: true, 
+        securityLevel: 'loose',
+        theme: 'neutral'
+    });
+
+    // Handle tooltips for Mermaid Nodes
+    document.addEventListener('mouseover', function(e) {
+        const node = e.target.closest('.node');
+        if (node) {
+            const nodeId = node.id.split('-')[1]; 
+            if (nodeDescriptions[nodeId]) {
+                const tooltip = document.getElementById('tooltip');
+                tooltip.innerHTML = nodeDescriptions[nodeId];
+                tooltip.style.display = 'block';
+                tooltip.style.left = (e.pageX + 15) + 'px';
+                tooltip.style.top = (e.pageY + 15) + 'px';
+            }
+        }
+    });
+
+    document.addEventListener('mouseout', function(e) {
+        if (e.target.closest('.node')) {
+            document.getElementById('tooltip').style.display = 'none';
+        }
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pancreas Diagnostic Decision Suite</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #c0392b; 
+            --link-color: #2980b9;
+            --bg-color: #f7f9fb;
+            --card-bg: #ffffff;
+            --text-color: #2d3436;
+            --shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 25px;
+            border-top: 5px solid var(--primary-color);
+        }
+
+        h2 {
+            margin-top: 0;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        /* Navigation Link Styling */
+        .prognosis-link-bar {
+            background: #ebf5fb;
+            border: 2px solid var(--link-color);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            transition: background 0.3s;
+        }
+
+        .prognosis-link-bar:hover {
+            background: #d6eaf8;
+        }
+
+        .prognosis-link-bar a {
+            color: var(--link-color);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .grid-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #636e72;
+        }
+
+        select {
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #dfe6e9;
+            background-color: #fff;
+            font-size: 1rem;
+        }
+
+        button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        #results {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #fffafa;
+            border-radius: 8px;
+            display: none;
+            border-left: 5px solid var(--accent-color);
+        }
+
+        .mindmap-container { overflow-x: auto; background: #fff; padding: 15px; border-radius: 8px; }
+
+        .tooltip {
+            position: absolute;
+            background: #2d3436;
+            color: #fff;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            z-index: 1000;
+            display: none;
+            max-width: 320px;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+<div id="tooltip" class="tooltip"></div>
+
+<div class="container">
+    <section class="card">
+        <h2>Pancreas Diagnostic Decision Support</h2>
+        <div class="grid-inputs">
+            <div class="input-group">
+                <label>Primary Imaging Pattern</label>
+                <select id="primaryFeature" onchange="updateSubBranch()">
+                    <option value="">-- Select Pattern --</option>
+                    <option value="solid_hypo">Solid Hypovascular Mass</option>
+                    <option value="solid_hyper">Solid Hypervascular Mass</option>
+                    <option value="cystic">Cystic Lesions</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Secondary Morphology</label>
+                <select id="secondaryFeature">
+                    <option value="">-- Select Morphology --</option>
+                </select>
+            </div>
+        </div>
+        <button onclick="analyzePancreas()">Generate Differential Diagnosis</button>
+
+        <div id="results">
+            <div id="diagnosisList"></div>
+        </div>
+    </section>
+
+    <div class="prognosis-link-bar">
+        <a href="file:///Users/irene/Decision%20tree/pancreatic%20_adenoCA.html">
+            📊 Open Pancreatic Adenocarcinoma Staging & Prognosis Tool
+        </a>
+    </div>
+
+    <section class="card">
+        <h2>Pancreatic Mind Map (Logic Hierarchy)</h2>
+        <div class="mindmap-container">
+            <pre class="mermaid">
+                graph LR
+                    Root[Pancreas Analysis] --> SOLID_HYPO[Solid Hypovascular]
+                    Root --> SOLID_HYPER[Solid Hypervascular]
+                    Root --> CYSTIC[Cystic Lesions]
+
+                    SOLID_HYPO --> SH1[Focal Mass + Duct Obstruction]
+                    SH1 --> PDAC[Ductal Adenocarcinoma]
+                    
+                    SOLID_HYPER --> PNET[Neuroendocrine Tumor]
+
+                    CYSTIC --> C1[Unilocular]
+                    CYSTIC --> C2[Multilocular / Complex]
+                    C2 --> IPMN[Intraductal Papillary Mucinous Neoplasm]
+
+                    click PDAC callback "Most common malignancy. Vascular encasement is common."
+                    click IPMN callback "Main Pancreatic Duct communication; 'Bunch of grapes' appearance."
+            </pre>
+        </div>
+    </section>
+</div>
+
+<script>
+    // Logic for the CDS tool
+    const pancreasData = {
+        "solid_hypo": {
+            subBranches: {
+                "focal": {
+                    label: "Focal Mass with Duct Obstruction",
+                    diagnosis: ["Pancreatic Ductal Adenocarcinoma", "Distal Cholangiocarcinoma"]
+                }
+            }
+        },
+        "solid_hyper": {
+            subBranches: {
+                "avid": {
+                    label: "Avid Arterial Enhancement",
+                    diagnosis: ["Pancreatic Neuroendocrine Tumor", "Solid Pseudopapillary Neoplasm"]
+                }
+            }
+        },
+        "cystic": {
+            subBranches: {
+                "complex": {
+                    label: "Multilocular / Complex",
+                    diagnosis: ["Intraductal Papillary Mucinous Neoplasm", "Mucinous Cystic Neoplasm"]
+                }
+            }
+        }
+    };
+
+    function updateSubBranch() {
+        const primary = document.getElementById('primaryFeature').value;
+        const secondaryDropdown = document.getElementById('secondaryFeature');
+        secondaryDropdown.innerHTML = '<option value="">-- Select Morphology --</option>';
+        if (primary && pancreasData[primary]) {
+            for (let key in pancreasData[primary].subBranches) {
+                let opt = document.createElement('option');
+                opt.value = key;
+                opt.innerText = pancreasData[primary].subBranches[key].label;
+                secondaryDropdown.appendChild(opt);
+            }
+        }
+    }
+
+    function analyzePancreas() {
+        const primary = document.getElementById('primaryFeature').value;
+        const secondary = document.getElementById('secondaryFeature').value;
+        const list = document.getElementById('diagnosisList');
+        if (!primary || !secondary) return;
+        list.innerHTML = "<strong>Differential:</strong><br>" + pancreasData[primary].subBranches[secondary].diagnosis.join(", ");
+        document.getElementById('results').style.display = "block";
+    }
+
+    mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+</script>
+
+</body>
+</html>
