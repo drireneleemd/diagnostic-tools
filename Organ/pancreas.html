@@ -45,7 +45,6 @@
                     <option value="solid_hyper">Branch 2: SOLID Hypervascular Mass</option>
                     <option value="cystic">Branch 3: CYSTIC Lesions</option>
                     <option value="inflammatory">Branch 4: INFLAMMATORY Mimics</option>
-                    <option value="differentiation">Branch 5: Differentiating Mimics</option>
                 </select>
             </div>
             <div>
@@ -116,7 +115,7 @@
             class SCM scm_s; class MCN mcn_s; class IPMN ipmn_s; class GRP grp_s;
             class SPN spn_s; class PCY pcy_s; class CHOL chol_s; class AMP amp_s;
             class CPNET cpnet_s; class AFPN afpn_s; class IPN ipn_s; 
-            class MFCP2 mfcp2_s; class GRP2 grp2_s; class AIP2 aip2_s;
+            class MFCP2 mfcp2_s class GRP2 grp2_s; class AIP2 aip2_s;
         </div>
     </div>
 </div>
@@ -130,7 +129,7 @@
         "solid_hyper": ["N/A"],
         "cystic": ["3A: Unilocular Cyst", "3B: Multilocular/Complex Cyst"],
         "inflammatory": ["4A: Acute Inflammatory Process", "4B: Chronic Inflammatory Mass"],
-        "differentiation": ["Features Favoring Pancreatic Ductal Adenocarcinoma", "Features Favoring Autoimmune Pancreatitis", "Features Favoring Mass-forming Chronic Pancreatitis"]
+        "differentiation": ["Features Favoring PDAC", "Features Favoring Autoimmune Pancreatitis", "Features Favoring Mass-forming Chronic Pancreatitis"]
     };
 
     function updateSecondaryOptions() {
@@ -153,18 +152,18 @@
         ".pnet_s": "<b>Neuroendocrine Tumor</b>: Avid arterial enhancement. Well-defined; may have cystic degeneration.",
         ".scm_s": "<b>Serous Cystadenoma</b>: Microcystic pattern with a central calcified scar. Benign.",
         ".mcn_s": "<b>Mucinous Cystic Neoplasm</b>: Female predilection, body/tail location, 'ovarian-type' stroma.",
-        ".ipmn_s": "<b>Intraductal Papillary Mucinous Neoplasm</b>: Communicates with the main pancreatic duct. 'Bunch of grapes' appearance.",
+        ".ipmn_s": "<b>IPMN</b>: Communicates with the main pancreatic duct. 'Bunch of grapes' appearance.",
         ".grp_s": "<b>Groove Pancreatitis</b>: Sheet-like soft tissue in the pancreaticoduodenal groove with duodenal wall thickening.",
         ".spn_s": "<b>Solid Pseudopapillary Neoplasm</b>: Large, well-encapsulated mass with hemorrhage in young women.",
         ".pcy_s": "<b>Pseudocyst</b>: History of acute pancreatitis; lacks an epithelial lining.",
-        ".chol_s": "<b>Cholangiocarcinoma</b>: Similar appearance to Pancreatic Ductal Adenocarcinoma when involving the distal biliary system.",
+        ".chol_s": "<b>Cholangiocarcinoma</b>: Similar appearance to PDAC when involving the distal biliary system.",
         ".amp_s": "<b>Ampullary Carcinoma</b>: Centered at the ampulla; often presents with the 'double duct' sign.",
-        ".cpnet_s":"<b>Cystic Neuroendocrine Tumor</b>: Rare variant of Neuroendocrine Tumor with cystic degeneration.",
-        ".afpn_s":"<b>Focal Acute Pancreatitis</b>: Peripancreatic stranding (81% in acute pancreatitis vs. Autoimmune Pancreatitis), fluid collections, history of acute episode.",
+        ".cpnet_s":"<b>Cystic PNET</b>: Rare variant of PNET with cystic degeneration.",
+        ".afpn_s":"<b>Focal Acute Pancreatitis</b>: Peripancreatic stranding (81% in acute pancreatitis vs. AIP), fluid collections, history of acute episode.",
         ".ipn_s":"<b>Infected Pancreatic Necrosis</b>: Gas within necrotic tissue, rim enhancement.",
-        ".mfcp2_s":"<b>Mass-forming Chronic Pancreatitis</b>: Displaced calcifications favor chronic pancreatitis over Pancreatic Ductal Adenocarcinoma, irregular Main Pancreatic Duct with strictures.",
+        ".mfcp2_s":"<b>Mass-forming Chronic Pancreatitis</b>: Displaced calcifications favor chronic pancreatitis over PDAC, irregular MPD with strictures.",
         ".grp2_s":"<b>Groove Pancreatitis</b>: Sheet-like soft tissue in pancreaticoduodenal groove, duodenal wall thickening.",
-        ".aip2_s":"<b>Focal Autoimmune Pancreatitis</b>: Homogeneous delayed enhancement, low Apparent Diffusion Coefficient, tapered Main Pancreatic Duct narrowing."
+        ".aip2_s":"<b>Focal Autoimmune Pancreatitis</b>: Homogeneous delayed enhancement, low ADC, tapered MPD narrowing."
     };
 
     function analyzePancreas() {
@@ -177,21 +176,21 @@
 
         if (prim === 'solid_hypo') {
             if (sec.includes('1a')) {
-                res = "<b>Branch 1A: Focal Mass with Duct Obstruction</b>\n• Pancreatic ductal adenocarcinoma\n• Distal Cholangiocarcinoma\n• Ampullary carcinoma\n• Metastasis to pancreas\n• Pancreatic Lymphoma";
+                res = "<b>Branch 1A: Focal Mass with Duct Obstruction</b>\n• Pancreatic ductal adenocarcinoma (PDAC)\n• Distal Cholangiocarcinoma\n• Ampullary carcinoma\n• Metastasis to pancreas\n• Pancreatic Lymphoma";
                 color = "#ef4444";
             } else {
-                res = "<b>Branch 1B: Diffuse/Infiltrative Pattern</b>\n• Autoimmune pancreatitis\n• Pancreatic Lymphoma\n• Mass-forming chronic pancreatitis\n• Groove pancreatitis (paraduodenal)";
+                res = "<b>Branch 1B: Diffuse/Infiltrative Pattern</b>\n• Autoimmune pancreatitis (AIP)\n• Pancreatic Lymphoma\n• Mass-forming chronic pancreatitis\n• Groove pancreatitis (paraduodenal)";
                 color = "#f59e0b";
             }
         } else if (prim === 'solid_hyper') {
-            res = "<b>Branch 2: Solid Hypervascular Mass</b>\n• Pancreatic neuroendocrine tumor\n• Solid pseudopapillary neoplasm\n• Hypervascular Metastases (Renal cell, melanoma)\n• Acinar cell carcinoma";
+            res = "<b>Branch 2: Solid Hypervascular Mass</b>\n• Pancreatic neuroendocrine tumor (PNET)\n• Solid pseudopapillary neoplasm\n• Hypervascular Metastases (Renal cell, melanoma)\n• Acinar cell carcinoma";
             color = "#10b981";
         } else if (prim === 'cystic') {
             if (sec.includes('3a')) {
                 res = "<b>Branch 3A: Unilocular Cyst</b>\n• Simple pancreatic cyst\n• Serous cystadenoma (macrocystic variant)\n• Pseudocyst";
                 color = "#3b82f6";
             } else {
-                res = "<b>Branch 3B: Multilocular/Complex Cyst</b>\n• Serous cystadenoma (microcystic variant)\n• Mucinous cystic neoplasm\n• Intraductal papillary mucinous neoplasm\n• Cystic Neuroendocrine Tumor";
+                res = "<b>Branch 3B: Multilocular/Complex Cyst</b>\n• Serous cystadenoma (microcystic variant)\n• Mucinous cystic neoplasm (MCN)\n• Intraductal papillary mucinous neoplasm (IPMN)\n• Cystic PNET";
                 color = "#8b5cf6";
             }
         } else if (prim === 'inflammatory') {
@@ -203,10 +202,10 @@
                 color = "#f59e0b";
             }
         } else if (prim === 'differentiation') {
-            if (sec.includes('adenocarcinoma')) {
-                res = "<b>Features Favoring Pancreatic Ductal Adenocarcinoma:</b>\n• Discrete mass (Diagnostic Odds Ratio 35)\n• Target-type enhancement (Diagnostic Odds Ratio 41)\n• Upstream Main Pancreatic Duct dilatation >4 mm\n• Upstream parenchymal atrophy (Diagnostic Odds Ratio 5)\n• Vascular encasement and abrupt duct cutoff\n• Peripancreatic fat infiltration (Diagnostic Odds Ratio 10)";
+            if (sec.includes('pdac')) {
+                res = "<b>Features Favoring PDAC:</b>\n• Discrete mass (DOR 35)\n• Target-type enhancement (DOR 41)\n• Upstream Main Pancreatic Duct dilatation >4 mm\n• Upstream parenchymal atrophy (DOR 5)\n• Vascular encasement and abrupt duct cutoff\n• Peripancreatic fat infiltration (DOR 10)";
             } else if (sec.includes('autoimmune')) {
-                res = "<b>Features Favoring Autoimmune Pancreatitis:</b>\n• Diffuse/sausage-shaped enlargement (64-88%)\n• Capsule-like rim (59%)\n• Homogeneous delayed enhancement\n• Multiple Main Pancreatic Duct strictures (Diagnostic Odds Ratio 47)\n• Duct-penetrating sign (Diagnostic Odds Ratio 14)\n• Low Apparent Diffusion Coefficient value (≤0.88 × 10⁻³ mm²/s)";
+                res = "<b>Features Favoring Autoimmune Pancreatitis:</b>\n• Diffuse/sausage-shaped enlargement (64-88%)\n• Capsule-like rim (59%)\n• Homogeneous delayed enhancement\n• Multiple Main Pancreatic Duct strictures (DOR 47)\n• Duct-penetrating sign (DOR 14)\n• Low Apparent Diffusion Coefficient value (≤0.88 × 10⁻³ mm²/s)";
             } else {
                 res = "<b>Features Favoring Mass-forming Chronic Pancreatitis:</b>\n• Duct-penetrating sign\n• Calcifications (especially if displaced)\n• Skip strictures of Main Pancreatic Duct or bile duct\n• Larger lesion size";
             }
