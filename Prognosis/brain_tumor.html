@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glioma Radiological Prognostic Suite</title>
+    <style>
+        :root {
+            --primary-color: #002855;
+            --secondary-color: #0077b6; /* Neural blue */
+            --danger-color: #c0392b;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #2d3436;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 950px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            padding: 30px;
+            border-top: 6px solid var(--primary-color);
+        }
+
+        h1, h2 { color: var(--primary-color); margin-top: 0; }
+        h1 { border-bottom: 2px solid #eee; padding-bottom: 10px; font-size: 1.6rem; }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .input-group { display: flex; flex-direction: column; gap: 8px; }
+        label { font-weight: 700; font-size: 0.85rem; color: #555; }
+        
+        select, input {
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            font-size: 0.95rem;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            width: 100%;
+        }
+
+        button:hover { background-color: #001a38; }
+
+        .result-panel {
+            margin-top: 25px;
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+            border-left: 6px solid var(--secondary-color);
+            background-color: #f1f4f8;
+        }
+
+        .prognosis-tag {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            color: white;
+            font-weight: bold;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+        }
+
+        .high-risk { background-color: var(--danger-color); }
+        .intermediate-risk { background-color: #d35400; }
+        .low-risk { background-color: #27ae60; }
+
+        .analysis-section { margin-bottom: 15px; }
+        .analysis-title { font-weight: bold; color: var(--primary-color); font-size: 0.9rem; text-decoration: underline; }
+
+        .ref-section {
+            padding: 20px;
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            border-top: 1px solid #ddd;
+        }
+        li { margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <h1>Glioma Radiological Prognosis Suite</h1>
+        <p style="font-size: 0.9rem;"><i>Analyze volumetric, anatomic, and advanced MRI parameters to stratify survival risk in patients with diffuse gliomas and glioblastoma.</i></p>
+        
+        <div class="input-grid">
+            <div class="input-group">
+                <label>Contrast-Enhancing Tumor Volume (cm³)</label>
+                <input type="number" id="ceVolume" step="0.1" placeholder="e.g., 18">
+            </div>
+
+            <div class="input-group">
+                <label>Peritumoral Edema/FLAIR Volume (mm³)</label>
+                <input type="number" id="flairVolume" step="1000" placeholder="e.g., 90000">
+            </div>
+
+            <div class="input-group">
+                <label>Anatomic Extension / Features</label>
+                <select id="anatomicFeatures">
+                    <option value="focal">Focal, Non-eloquent</option>
+                    <option value="multifocal">Multifocal / Multilobar</option>
+                    <option value="midline">Corpus Callosum / Midline Extension</option>
+                    <option value="ependymal">Ependymal Involvement</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Contrast Enhancement Pattern</label>
+                <select id="enhancementPattern">
+                    <option value="none">No Enhancement</option>
+                    <option value="solid">Solid / Nodular</option>
+                    <option value="ring">Ring Enhancement</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Max normalized rCBV (Perfusion)</label>
+                <input type="number" id="rcbvValue" step="0.1" placeholder="e.g., 2.8">
+            </div>
+
+            <div class="input-group">
+                <label>Minimum ADC Value (× 10⁻³ mm²/s)</label>
+                <input type="number" id="adcValue" step="0.001" placeholder="e.g., 0.750">
+            </div>
+        </div>
+
+        <button onclick="calculateGliomaPrognosis()">Analyze Radiological Prognosis</button>
+
+        <div id="prognosisResult" class="result-panel">
+            <div id="riskLevel" class="prognosis-tag"></div>
+            <div class="analysis-section">
+                <div class="analysis-title">Volumetric & Anatomic Analysis</div>
+                <div id="volInfo"></div>
+            </div>
+            <div class="analysis-section">
+                <div class="analysis-title">Advanced Imaging Physiology</div>
+                <div id="physInfo"></div>
+            </div>
+            <div class="analysis-section">
+                <div class="analysis-title">Clinical & Survival Notes</div>
+                <div id="survivalInfo"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card ref-section">
+        <h3>References</h3>
+        <ol>
+            <li>Wangaryattawanich P, et al. Neuro-Oncology. 2015;17(11):1525-37.</li>
+            <li>Aiudi D, et al. Journal of Clinical Medicine. 2024;13(3):849.</li>
+            <li>Mummareddy N, et al. Journal of Clinical Neuroscience. 2021;84:1-7.</li>
+            <li>Darvishi P, et al. AJNR. 2020;41(5):815-821.</li>
+            <li>Park M, et al. Journal of Neuro-Oncology. 2017;134(2):423-431.</li>
+            <li>van den Bent MJ, et al. Lancet. 2023;402(10412):1564-1579.</li>
+            <li>Hou BL, et al. World Neurosurgery. 2019;124:e285-e295.</li>
+            <li>Hilario A, et al. AJNR. 2014;35(6):1096-102.</li>
+            <li>Salvalaggio A, et al. JAMA Neurology. 2023;80(11):1222-1231.</li>
+            <li>Wang K, et al. Neuro-Oncology. 2016;18(4):589-97.</li>
+            <li>Scientific Reports. 2024;14(1):27551.</li>
+        </ol>
+    </div>
+</div>
+
+<script>
+    function calculateGliomaPrognosis() {
+        const ceVol = parseFloat(document.getElementById('ceVolume').value);
+        const flairVol = parseFloat(document.getElementById('flairVolume').value);
+        const anatomic = document.getElementById('anatomicFeatures').value;
+        const enhancement = document.getElementById('enhancementPattern').value;
+        const rcbv = parseFloat(document.getElementById('rcbvValue').value);
+        const adc = parseFloat(document.getElementById('adcValue').value);
+
+        const resBox = document.getElementById('prognosisResult');
+        let riskScore = 0; // Cumulative risk tracker
+        let volNotes = "";
+        let physNotes = "";
+        let survivalNotes = "";
+
+        // Volumetric Logic
+        if (ceVol > 15) {
+            riskScore += 2;
+            volNotes += "• <strong>High Contrast Volume:</strong> CE tumor >15 cm³ independently predicts worse overall survival.<br>";
+        }
+        if (flairVol > 85000) {
+            riskScore += 2;
+            volNotes += "• <strong>Extensive Edema:</strong> T2/FLAIR hyperintensity >85,000 mm³ is associated with significantly increased mortality.<br>";
+        }
+        if (anatomic !== 'focal') {
+            riskScore += 1;
+            volNotes += `• <strong>Invasive Distribution:</strong> ${anatomic.replace(/([A-Z])/g, ' $1')} is associated with worse surgical and survival outcomes.<br>`;
+        }
+
+        // Enhancement Logic
+        if (enhancement === 'ring') {
+            riskScore += 1;
+            volNotes += "• <strong>Enhancement Pattern:</strong> Presence of ring enhancement in glioblastoma predicts worse survival compared to non-ring patterns.<br>";
+        }
+
+        // Perfusion Logic
+        if (rcbv > 2.5) {
+            riskScore += 2;
+            physNotes += `• <strong>Hyperperfusion (rCBV ${rcbv}):</strong> Normalized rCBV >2.5 is a dominant predictor of overall survival (HR 5.97), indicating aggressive tumor neoangiogenesis.<br>`;
+        }
+
+        // Diffusion Logic
+        if (adc < 0.799) {
+            riskScore += 2;
+            physNotes += `• <strong>Low ADC (${adc}):</strong> ADC <0.799 × 10⁻³ mm²/s predicts median survival of less than one year, reflecting high cellular density.<br>`;
+        }
+
+        // Stratification & Survival Note
+        let riskClass = "";
+        if (riskScore >= 6) {
+            riskClass = "high-risk";
+            survivalNotes = "Findings highly suggestive of aggressive high-grade behavior. Expected survival is significantly reduced. Advanced techniques (rCBV/ADC) may outperform age and histologic grade as prognostic factors.";
+        } else if (riskScore >= 3) {
+            riskClass = "intermediate-risk";
+            survivalNotes = "Intermediate risk profile. Multimodal integration of rCBV and volumetric data is recommended to refine stratification. Consider potential for malignant transformation in IDH-mutant subtypes.";
+        } else {
+            riskClass = "low-risk";
+            survivalNotes = "Favorable radiological profile. Lower cellularity (higher ADC) and limited perfusion (lower rCBV) correlate with better outcomes, though ongoing monitoring for malignant degeneration remains necessary.";
+        }
+
+        // Output Render
+        document.getElementById('riskLevel').innerText = riskClass.replace("-", " ").toUpperCase();
+        document.getElementById('riskLevel').className = `prognosis-tag ${riskClass}`;
+        document.getElementById('volInfo').innerHTML = volNotes || "• Volumetric and anatomic parameters within relatively favorable ranges.";
+        document.getElementById('physInfo').innerHTML = physNotes || "• Advanced MRI parameters (Perfusion/Diffusion) within standard/lower-risk thresholds.";
+        document.getElementById('survivalInfo').innerHTML = `<strong>Note:</strong> ${survivalNotes}`;
+        
+        resBox.style.display = "block";
+    }
+</script>
+
+</body>
+</html>
