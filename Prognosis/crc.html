@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colorectal Cancer Radiological & Pathologic Prognosis Suite</title>
+    <style>
+        :root {
+            --primary-color: #004d40; /* Deep teal/bowel theme */
+            --secondary-color: #827717; /* Olive accent */
+            --danger-color: #b71c1c;
+            --bg-color: #f1f8e9;
+            --card-bg: #ffffff;
+            --text-color: #263238;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 950px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            padding: 30px;
+            border-top: 6px solid var(--primary-color);
+        }
+
+        h1, h2, h3 { color: var(--primary-color); margin-top: 0; }
+        h1 { border-bottom: 2px solid #e0e0e0; padding-bottom: 10px; font-size: 1.6rem; }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .input-group { display: flex; flex-direction: column; gap: 8px; }
+        label { font-weight: 700; font-size: 0.9rem; color: #455a64; }
+        
+        select, input {
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #cfd8dc;
+            font-size: 1rem;
+            background-color: #fff;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+        }
+
+        button:hover { background-color: #00251a; transform: translateY(-1px); }
+
+        .result-panel {
+            margin-top: 25px;
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+            border-left: 6px solid var(--primary-color);
+            background-color: #ffffff;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .prognosis-tag {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            color: white;
+            font-weight: bold;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .high-risk { background-color: var(--danger-color); }
+        .intermediate-risk { background-color: #ef6c00; }
+        .low-risk { background-color: #2e7d32; }
+
+        .analysis-block { margin-top: 15px; border-top: 1px solid #eee; padding-top: 10px; }
+        .analysis-label { font-weight: bold; font-size: 0.95rem; color: var(--primary-color); }
+
+        .ref-section {
+            padding: 20px;
+            font-size: 0.85rem;
+            color: #546e7a;
+            background: #fafafa;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <h1>Colorectal Cancer: Staging & Prognostic Stratification</h1>
+        <p><i>Utilizing American Joint Committee on Cancer (AJCC) 8th Edition TNM criteria and National Comprehensive Cancer Network (NCCN) prognostic factors.</i></p>
+        
+        <div class="input-grid">
+            <div class="input-group">
+                <label>Depth of Invasion (T Stage)</label>
+                <select id="tStage">
+                    <option value="T1">T1: Submucosa</option>
+                    <option value="T2">T2: Muscularis Propria</option>
+                    <option value="T3">T3: Pericolorectal Tissues</option>
+                    <option value="T4a">T4a: Visceral Peritoneum (Serosa)</option>
+                    <option value="T4b">T4b: Adjacent Organs/Structures</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Regional Lymph Nodes (N Stage)</label>
+                <select id="nStage">
+                    <option value="N0">N0: No involved nodes</option>
+                    <option value="N1">N1: 1-3 positive nodes / Tumor Deposits</option>
+                    <option value="N2">N2: 4 or more positive nodes</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Distant Metastasis (M Stage)</label>
+                <select id="mStage">
+                    <option value="M0">M0: No distant metastasis</option>
+                    <option value="M1a">M1a: Single organ/site</option>
+                    <option value="M1b">M1b: Multi-organ (No Peritoneum)</option>
+                    <option value="M1c">M1c: Peritoneal Involvement</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>High-Risk Pathologic Features</label>
+                <select id="pathFeatures">
+                    <option value="none">None / Low Grade</option>
+                    <option value="high">Poor Differentiation / LVI / PNI</option>
+                    <option value="td_high">≥3 Tumor Deposits (N1c / M1a equivalent)</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Molecular Profile (MSI/MMR Status)</label>
+                <select id="molecularStatus">
+                    <option value="mss">MSS / pMMR (Standard)</option>
+                    <option value="msih">MSI-High / dMMR (Favorable)</option>
+                </select>
+            </div>
+        </div>
+
+        <button onclick="calculateColorectalPrognosis()">Analyze Radiological & Pathologic Prognosis</button>
+
+        <div id="prognosisResult" class="result-panel">
+            <div id="riskLevel" class="prognosis-tag"></div>
+            <div class="analysis-block">
+                <div class="analysis-label">TNM Composite Stage</div>
+                <div id="compositeStage"></div>
+            </div>
+            <div class="analysis-block">
+                <div class="analysis-label">Prognostic Stratification</div>
+                <div id="stratificationInfo"></div>
+            </div>
+            <div class="analysis-block">
+                <div class="analysis-label">Clinical Evidence & Considerations</div>
+                <div id="prognosticNotes"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card ref-section">
+        <h3>References</h3>
+        <ol>
+            <li>National Comprehensive Cancer Network. Colon Cancer (Version 2025-10-30) & Rectal Cancer (Version 2025-10-31).</li>
+            <li>AJCC Cancer Staging Manual, 8th Edition.</li>
+            <li>Shi Q, et al. Non-hierarchical survival patterns in Stage II vs III. JCO 2025.</li>
+            <li>Sassun R, et al. Integration of Tumor Deposits in N Staging. JAMA Surgery 2025.</li>
+            <li>Arrichiello G, et al. Beyond N Staging in Colorectal Cancer. Frontiers in Oncology 2022.</li>
+        </ol>
+    </div>
+</div>
+
+<script>
+    function calculateColorectalPrognosis() {
+        const t = document.getElementById('tStage').value;
+        const n = document.getElementById('nStage').value;
+        const m = document.getElementById('mStage').value;
+        const path = document.getElementById('pathFeatures').value;
+        const mol = document.getElementById('molecularStatus').value;
+        
+        let composite = "";
+        let riskClass = "";
+        let stratNote = "";
+        let evidenceNote = "";
+
+        // 1. Determine Stage Group
+        if (m.startsWith("M1")) {
+            composite = "Stage IV (Metastatic)";
+            riskClass = "high-risk";
+        } else if (n !== "N0") {
+            composite = "Stage III (Regional Nodal Disease)";
+            riskClass = "intermediate-risk";
+        } else if (t === "T3" || t.startsWith("T4")) {
+            composite = "Stage II (Invasive, No Nodes)";
+            riskClass = "intermediate-risk";
+        } else {
+            composite = "Stage I (Localized)";
+            riskClass = "low-risk";
+        }
+
+        // 2. Refine Stratification using Molecular and Pathologic factors
+        if (m === "M1c") {
+            stratNote = "Critical Prognosis: Peritoneal metastasis (M1c) carries the highest risk profile.";
+        } else if (t === "T4b" && n === "N0") {
+            riskClass = "high-risk";
+            stratNote = "Non-hierarchical Risk: T4bN0 (Stage II) may demonstrate survival outcomes worse than early Stage III (T1-2N1).";
+        } else if (path === "td_high") {
+            riskClass = "high-risk";
+            stratNote = "High Tumor Deposit Count (≥3): Survival comparable to M1a disease; exceeds standard N1c classification significance.";
+        } else if (mol === "msih") {
+            if (riskClass !== "high-risk") riskClass = "low-risk";
+            stratNote = "Favorable Molecular Profile: MSI-High/dMMR status is associated with better prognosis.";
+        } else {
+            stratNote = "Standard Staging: Prognosis follows AJCC 8th Edition TNM hierarchy.";
+        }
+
+        // 3. Evidence Notes
+        evidenceNote = "Minimum 12 lymph nodes should be examined for accurate N-staging.";
+        if (path === "high") {
+            evidenceNote += " Poor differentiation, lymphovascular invasion, or perineural invasion are adverse indicators regardless of stage.";
+        }
+        if (mol === "msih" && composite.includes("III")) {
+            evidenceNote += " MSI status is a critical adjuvant therapy decision factor in Stage II/III disease.";
+        }
+
+        // Output Display
+        document.getElementById('riskLevel').innerText = riskClass.replace("-", " ");
+        document.getElementById('riskLevel').className = `prognosis-tag ${riskClass}`;
+        document.getElementById('compositeStage').innerHTML = `<strong>AJCC 8th Ed:</strong> ${composite} (${t}${n}${m})`;
+        document.getElementById('stratificationInfo').innerHTML = stratNote;
+        document.getElementById('prognosticNotes').innerHTML = evidenceNote;
+        document.getElementById('prognosisResult').style.display = "block";
+    }
+</script>
+
+</body>
+</html>
