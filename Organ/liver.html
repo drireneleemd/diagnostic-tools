@@ -87,7 +87,7 @@
 
             B2 --- B2B(2B: Solid/Low Attenuation)
             B2B --- MET[Metastases]
-            B2B --- ICC2[Cholangiocarcinoma]
+            B2B --- ICC2[Cholangiocarcinoma Solid]
             B2B --- LYM[Lymphoma]
             B2B --- FMAB[Fungal Microabscesses]
 
@@ -111,13 +111,13 @@
             B5 --- AIH[Autoimmune Hepatitis]
             B5 --- FUN[Fungal Infection]
 
-            class HCC hcc_s; class ICC icc_s; class HM1 hm1_s; class HMG hmg_s;
-            class FNH fnh_s; class HCA hca_s; class SCY scy_s; class HABS habs_s;
-            class ECY ecy_s; class CMET cmet_s; class MET met_s; class ICC2 icc2_s;
-            class LYM lym_s; class FMAB fmab_s; class STEA stea_s; class HEMO hemo_s;
+            class HCC hcc_s; class ICC,ICC2 icc_s; class HM1 hm1_s; class HMG hmg_s;
+            class FNH fnh_s; class HCA hca_s; class SCY scy_s; class HABS abs_s;
+            class ECY ecy_s; class CMET cmet_s; class MET met_s;
+            class LYM lym_s; class FMAB,FUN fun_s; class STEA stea_s; class HEMO hemo_s;
             class CIRR cirr_s; class PSC psc_s; class PBC pbc_s; class IGG4 igg4_s;
             class PVT pvt_s; class PSVD psvd_s; class BCS bcs_s; class INF inf_s;
-            class ABS abs_s; class HEP hep_s; class AIH aih_s; class FUN fun_s;
+            class ABS abs_s; class HEP hep_s; class AIH aih_s;
         </div>
     </div>
 </div>
@@ -130,8 +130,8 @@
         "hypervascular": ["1A: Washout Present", "1B: No Washout / Persistent Enhancement"],
         "hypovascular": ["2A: Cystic / Fluid Attenuation", "2B: Solid / Low Attenuation"],
         "diffuse": ["3A: Increased Attenuation / Altered Signal", "3B: Biliary Pattern (Ductal Dilatation)"],
-        "vascular": ["N/A"],
-        "infectious": ["N/A"]
+        "vascular": ["4A: Vascular Abnormalities"],
+        "infectious": ["5A: Regional or Multifocal Involvement"]
     };
 
     function updateSecondaryOptions() {
@@ -149,18 +149,30 @@
 
     const descriptions = {
         ".hcc_s": "<b>Hepatocellular Carcinoma (HCC)</b>: Most common in cirrhosis. Features arterial phase hyperenhancement and 'washout' on delayed phases.",
+        ".icc_s": "<b>Intrahepatic Cholangiocarcinoma</b>: May feature progressive delayed enhancement on solid components.",
+        ".hm1_s": "<b>Hypervascular Metastases</b>: Neuroendocrine, melanoma, or renal cell carcinoma primaries typically show avid arterial enhancement.",
         ".hmg_s": "<b>Hemangioma</b>: Peripheral nodular discontinuous enhancement with centripetal fill-in.",
-        ".fnh_s": "<b>Focal Nodular Hyperplasia (FNH)</b>: Benign lesion with a central scar and homogeneous enhancement.",
-        ".hca_s": "<b>Hepatocellular Adenoma</b>: Variable enhancement; may contain fat. Often associated with oral contraceptives or steroids.",
-        ".met_s": "<b>Metastases</b>: Most common malignant liver lesion overall. Usually multiple and hypoenhancing.",
-        ".habs_s": "<b>Hepatic Abscess (Pyogenic)</b>: Rim enhancement with a low attenuation fluid center.",
+        ".fnh_s": "<b>Focal Nodular Hyperplasia (FNH)</b>: Features a central scar and homogeneous enhancement; iso/hyperintense on hepatobiliary phase MRI.",
+        ".hca_s": "<b>Hepatocellular Adenoma</b>: Variable enhancement; may contain fat; often associated with oral contraceptives.",
+        ".scy_s": "<b>Simple Hepatic Cyst</b>: No enhancement; homogeneous fluid signal.",
+        ".abs_s": "<b>Pyogenic Abscess</b>: Rim-enhancing fluid collection with low attenuation center.",
         ".ecy_s": "<b>Echinococcal Cyst</b>: Features daughter cysts and wall calcifications.",
+        ".cmet_s": "<b>Cystic Metastases</b>: Typically associated with mucinous primaries.",
+        ".met_s": "<b>Metastases (Solid)</b>: Most common malignant liver lesion overall; usually multiple and low attenuation.",
+        ".lym_s": "<b>Lymphoma</b>: Homogeneous, minimal enhancement.",
         ".stea_s": "<b>Hepatic Steatosis</b>: Decreased attenuation on Computed Tomography; signal drop on opposed-phase Magnetic Resonance Imaging.",
         ".hemo_s": "<b>Hemochromatosis</b>: Increased attenuation on Computed Tomography; decreased T2 signal on Magnetic Resonance Imaging.",
         ".cirr_s": "<b>Cirrhosis</b>: Nodular contour and volume redistribution (e.g., enlarged caudate lobe).",
-        ".psc_s": "<b>Primary Sclerosing Cholangitis (PSC)</b>: Multifocal biliary strictures and dilatations ('beaded' appearance).",
+        ".psc_s": "<b>Primary Sclerosing Cholangitis (PSC)</b>: Multifocal biliary strictures and dilatations on MRCP ('beaded' appearance).",
+        ".pbc_s": "<b>Primary Biliary Cholangitis (PBC)</b>: Features intrahepatic duct paucity.",
+        ".igg4_s": "<b>IgG4-related Sclerosing Cholangitis</b>: Diffuse or segmental bile duct involvement.",
+        ".pvt_s": "<b>Portal Vein Thrombosis</b>: Filling defect in the portal vein with low attenuation on Computed Tomography.",
+        ".psvd_s": "<b>Porto-sinusoidal Vascular Disease</b>: Portal hypertension without cirrhotic morphology; increased caudate-to-right lobe ratio.",
         ".bcs_s": "<b>Budd-Chiari Syndrome</b>: Hepatic vein occlusion and caudate lobe hypertrophy.",
-        ".psvd_s": "<b>Porto-sinusoidal Vascular Disease</b>: Portal hypertension without cirrhosis; increased caudate-to-right lobe ratio."
+        ".inf_s": "<b>Hepatic Infarction</b>: Wedge-shaped peripheral areas of decreased enhancement.",
+        ".hep_s": "<b>Viral Hepatitis</b>: Features periportal edema and gallbladder wall thickening.",
+        ".aih_s": "<b>Autoimmune Hepatitis</b>: Heterogeneous parenchymal enhancement and periportal edema.",
+        ".fun_s": "<b>Fungal Infection / Microabscesses</b>: Multiple small hypodense lesions in immunocompromised patients."
     };
 
     function analyzeLiver() {
@@ -173,15 +185,15 @@
 
         if (prim === 'hypervascular') {
             if (sec.includes('1a')) {
-                res = "<b>Branch 1A: Washout Present</b>\n• Hepatocellular Carcinoma (HCC): Common in cirrhosis\n• Intrahepatic Cholangiocarcinoma\n• Hypervascular Metastases: Neuroendocrine, Melanoma, Renal Cell";
+                res = "<b>Branch 1A: Washout Present</b>\n• Hepatocellular Carcinoma (HCC): Common in cirrhosis\n• Intrahepatic Cholangiocarcinoma: Progressive delayed enhancement\n• Hypervascular Metastases: Neuroendocrine, Melanoma, Renal Cell";
                 color = "#ef4444";
             } else {
-                res = "<b>Branch 1B: No Washout / Persistent Enhancement</b>\n• Hemangioma: Peripheral nodular enhancement with centripetal fill-in\n• Focal Nodular Hyperplasia (FNH): Central scar\n• Hepatocellular Adenoma: Variable; may contain fat";
+                res = "<b>Branch 1B: No Washout / Persistent Enhancement</b>\n• Hemangioma: Peripheral nodular enhancement with centripetal fill-in\n• Focal Nodular Hyperplasia (FNH): Central scar; homogeneous enhancement\n• Hepatocellular Adenoma: Variable; may contain fat";
                 color = "#10b981";
             }
         } else if (prim === 'hypovascular') {
             if (sec.includes('2a')) {
-                res = "<b>Branch 2A: Cystic / Fluid Attenuation</b>\n• Simple Hepatic Cyst: No enhancement\n• Hepatic Abscess: Rim enhancement\n• Echinococcal Cyst: Daughter cysts/calcifications\n• Cystic Metastases: Mucinous primaries";
+                res = "<b>Branch 2A: Cystic / Fluid Attenuation</b>\n• Simple Hepatic Cyst: No enhancement\n• Hepatic Abscess (Pyogenic): Rim enhancement\n• Echinococcal Cyst: Daughter cysts/calcifications\n• Cystic Metastases: Mucinous primaries";
                 color = "#3b82f6";
             } else {
                 res = "<b>Branch 2B: Solid / Low Attenuation</b>\n• Metastases: Most common malignant liver lesion overall\n• Cholangiocarcinoma: Progressive delayed enhancement\n• Lymphoma: Homogeneous, minimal enhancement\n• Fungal Microabscesses: Small lesions in immunocompromised";
@@ -189,17 +201,17 @@
             }
         } else if (prim === 'diffuse') {
             if (sec.includes('3a')) {
-                res = "<b>Branch 3A: Altered Signal / Attenuation</b>\n• Hepatic Steatosis: Decreased attenuation\n• Hemochromatosis: Increased attenuation\n• Cirrhosis: Nodular contour";
+                res = "<b>Branch 3A: Altered Signal / Attenuation</b>\n• Hepatic Steatosis: Decreased attenuation on CT\n• Hemochromatosis: Increased attenuation on CT\n• Cirrhosis: Nodular contour; volume redistribution";
                 color = "#f59e0b";
             } else {
-                res = "<b>Branch 3B: Biliary Pattern (Ductal Dilatation)</b>\n• Primary Sclerosing Cholangitis: Multifocal strictures\n• Primary Biliary Cholangitis: Duct paucity\n• IgG4-related Sclerosing Cholangitis";
+                res = "<b>Branch 3B: Biliary Pattern (Ductal Dilatation)</b>\n• Primary Sclerosing Cholangitis: Multifocal strictures and dilatations\n• Primary Biliary Cholangitis: Duct paucity\n• IgG4-related Sclerosing Cholangitis: Segmental involvement";
                 color = "#3b82f6";
             }
         } else if (prim === 'vascular') {
-            res = "<b>Branch 4: Vascular Pattern</b>\n• Portal Vein Thrombosis: Filling defect\n• Porto-sinusoidal Vascular Disease: Portal hypertension without cirrhosis\n• Budd-Chiari Syndrome: Hepatic vein occlusion\n• Hepatic Infarction: Wedge-shaped area";
+            res = "<b>Branch 4: Vascular Pattern</b>\n• Portal Vein Thrombosis: Filling defect; low attenuation\n• Porto-sinusoidal Vascular Disease: Portal hypertension without cirrhosis\n• Budd-Chiari Syndrome: Hepatic vein occlusion; caudate hypertrophy\n• Hepatic Infarction: Wedge-shaped peripheral areas";
             color = "#f43f5e";
         } else if (prim === 'infectious') {
-            res = "<b>Branch 5: Infectious / Inflammatory</b>\n• Pyogenic Abscess: Rim-enhancing fluid\n• Viral Hepatitis: Periportal edema\n• Autoimmune Hepatitis: Heterogeneous enhancement\n• Fungal Infection: Multiple hypodense lesions";
+            res = "<b>Branch 5: Infectious / Inflammatory Pattern</b>\n• Pyogenic Abscess: Rim-enhancing fluid collection\n• Viral Hepatitis: Periportal edema; gallbladder thickening\n• Autoimmune Hepatitis: Heterogeneous enhancement\n• Fungal Infection: Multiple small hypodense lesions";
             color = "#8b5cf6";
         }
 
